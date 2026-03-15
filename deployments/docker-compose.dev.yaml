@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16.2-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: atlas-db
+    ports:
+      - 5433:5432
+    restart: on-failure
+
+  postgres-test:
+    image: postgres:16.2-alpine
+    container_name: postgres-test
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: atlas_test
+    ports:
+      - 5434:5432   
+    restart: on-failure
