@@ -21,7 +21,8 @@ var (
 	ErrInvalidSeatCount = errors.New("total seats must be greater than zero")       // total seats must be greater than zero
 	ErrTooManySeats     = errors.New("total seats exceeds maximum allowed of 1000") // total seats exceeds maximum allowed of 1000
 
-	ErrInternal = errors.New("internal server error") // internal server error
+	ErrInternal                = errors.New("internal server error")    // internal server error
+	ErrInsufficientPermissions = errors.New("insufficient permissions") // insufficient permissions
 
 	ErrUserAlreadyExists  = errors.New("user already exists")                 // user already exists
 	ErrPasswordTooLong    = errors.New("password is too long")                // password is too long

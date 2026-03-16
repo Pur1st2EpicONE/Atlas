@@ -12,7 +12,7 @@ func (s *AuthStorage) GetUserByLogin(ctx context.Context, login string) (models.
 
 	row, err := s.db.QueryRowWithRetry(ctx, retry.Strategy(s.config.QueryRetryStrategy), `
 
-    SELECT id, username, password
+    SELECT id, username, password, role
     FROM users
     WHERE username = $1`,
 
@@ -22,7 +22,7 @@ func (s *AuthStorage) GetUserByLogin(ctx context.Context, login string) (models.
 	}
 
 	var user models.User
-	err = row.Scan(&user.ID, &user.Login, &user.Password)
+	err = row.Scan(&user.ID, &user.Login, &user.Password, &user.Role)
 	if err != nil {
 		return models.User{}, err
 	}

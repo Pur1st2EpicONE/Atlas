@@ -7,13 +7,16 @@ import (
 	"Atlas/internal/repository"
 	"Atlas/internal/service/impl"
 	"context"
+
+	"github.com/golang-jwt/jwt"
 )
 
 type AuthService interface {
 	CreateUser(ctx context.Context, user models.User) (int64, error)
-	CreateToken(userID int64) (string, error)
-	GetUserId(ctx context.Context, user models.User) (int64, error)
+	CreateToken(user models.User) (string, error)
+	GetUser(ctx context.Context, user models.User) (models.User, error)
 	ParseToken(tokenString string) (int64, error)
+	KeyFunc(token *jwt.Token) (any, error)
 }
 
 type CoreService interface {

@@ -15,14 +15,14 @@ func (h *Handler) SignIn(c *ginext.Context) {
 		return
 	}
 
-	userID, err := h.service.GetUserId(c.Request.Context(),
+	user, err := h.service.GetUser(c.Request.Context(),
 		models.User{Login: request.Login, Password: request.Password})
 	if err != nil {
 		RespondError(c, err)
 		return
 	}
 
-	token, err := h.service.CreateToken(userID)
+	token, err := h.service.CreateToken(user)
 	if err != nil {
 		RespondError(c, err)
 		return

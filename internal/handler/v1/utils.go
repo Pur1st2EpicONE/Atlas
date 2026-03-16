@@ -78,6 +78,9 @@ func mapErrorToStatus(err error) (int, string) {
 		errors.Is(err, errs.ErrInvalidCredentials):
 		return http.StatusUnauthorized, err.Error()
 
+	case errors.Is(err, errs.ErrInsufficientPermissions):
+		return http.StatusForbidden, err.Error()
+
 	default:
 		return http.StatusInternalServerError, errs.ErrInternal.Error()
 	}

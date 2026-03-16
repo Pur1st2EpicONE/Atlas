@@ -5,7 +5,8 @@ import "time"
 type User struct {
 	ID       int64
 	Login    string `json:"login"`
-	Password string `json:"password"`
+	Password string
+	Role     string `json:"role"`
 }
 
 type Event struct {
