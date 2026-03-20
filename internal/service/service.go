@@ -20,7 +20,12 @@ type AuthService interface {
 }
 
 type CoreService interface {
-	CreateEvent(ctx context.Context, event *models.Event) (string, error)
+	CreateItem(ctx context.Context, userID int64, item models.Item) (models.Item, error)
+	UpdateItem(ctx context.Context, userID int64, itemID int64, update models.Update) error
+	DeleteItem(ctx context.Context, userID int64, itemID int64) error
+	GetItem(ctx context.Context, itemID int64) (models.Item, error)
+	GetItems(ctx context.Context) ([]models.Item, error)
+	GetItemHistory(ctx context.Context, itemID int64) ([]models.ItemHistory, error)
 }
 
 type Service struct {
@@ -30,7 +35,7 @@ type Service struct {
 
 func NewService(logger logger.Logger, config config.Service, storage *repository.Storage) *Service {
 	return &Service{
-		AuthService: impl.NewAuthService(logger, config, storage.AuthStorage),
-		CoreService: impl.NewCoreService(logger, storage.CoreStorage),
+		AuthService: impl.NewAuthService(logger, config.Auth, storage.AuthStorage),
+		CoreService: impl.NewCoreService(logger, config.Core, storage.CoreStorage),
 	}
 }

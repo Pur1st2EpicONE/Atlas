@@ -12,7 +12,7 @@ import (
 
 func (a *AuthService) GetUser(ctx context.Context, allegedUser models.User) (models.User, error) {
 
-	if err := validateUser(allegedUser); err != nil {
+	if err := a.validateUser(allegedUser); err != nil {
 		return models.User{}, err
 	}
 

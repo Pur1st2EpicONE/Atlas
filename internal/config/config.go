@@ -29,8 +29,25 @@ type Server struct {
 }
 
 type Service struct {
-	TokenTTL          time.Duration `mapstructure:"token_ttl"`
+	Auth Auth `mapstructure:"auth"`
+	Core Core `mapstructure:"core"`
+}
+
+type Auth struct {
 	TokenSignedString string
+	TokenTTL          time.Duration `mapstructure:"token_ttl"`
+	MinLoginLength    int           `mapstructure:"min_login_length"`
+	MaxLoginLength    int           `mapstructure:"max_login_length"`
+	MinPasswordLength int           `mapstructure:"min_password_length"`
+}
+
+type Core struct {
+	MinItemNameLength        int   `mapstructure:"min_item_name_length"`
+	MaxItemNameLength        int   `mapstructure:"max_item_name_length"`
+	MaxItemDescriptionLength int   `mapstructure:"max_item_description_length"`
+	MinItemQuantity          int   `mapstructure:"min_item_quantity"`
+	MaxItemQuantity          int   `mapstructure:"max_item_quantity"`
+	MaxItemPrice             int64 `mapstructure:"max_item_price"`
 }
 
 type Storage struct {
@@ -83,6 +100,6 @@ func loadEnvs(conf *Config) {
 	conf.Storage.Username = os.Getenv("DB_USER")
 	conf.Storage.Password = os.Getenv("DB_PASSWORD")
 
-	conf.Service.TokenSignedString = os.Getenv("JWT_TOKEN_SIGNED_STRING")
+	conf.Service.Auth.TokenSignedString = os.Getenv("JWT_TOKEN_SIGNED_STRING")
 
 }

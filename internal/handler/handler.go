@@ -5,8 +5,6 @@ import (
 	"Atlas/internal/errs"
 	"Atlas/internal/service"
 	"Atlas/internal/service/impl"
-	"context"
-	"errors"
 	"net/http"
 	"slices"
 	"strconv"
@@ -19,12 +17,16 @@ import (
 	"github.com/wb-go/wbf/ginext"
 )
 
-const header = "Authorization"
+const (
+	header  = "Authorization"
+	viewer  = "viewer"
+	manager = "manager"
+	admin   = "admin"
+)
 
 func NewHandler(config config.Server, service *service.Service) http.Handler {
 
 	handler := ginext.New("")
-
 	handler.Use(ginext.Recovery())
 	handler.Static("/static", "./web/static")
 
@@ -38,7 +40,19 @@ func NewHandler(config config.Server, service *service.Service) http.Handler {
 	protected := apiV1.Group("/")
 	protected.Use(authJWT(service.AuthService))
 
-	protected.POST("/events", handlerV1.CreateEvent)
+	items := protected.Group("/items")
+
+	viewGroup := items.Group("").Use(requireRole(viewer, manager, admin))
+	viewGroup.GET("", handlerV1.GetItems)
+	viewGroup.GET("/:id", handlerV1.GetItem)
+	viewGroup.GET("/:id/history", handlerV1.GetItemHistory)
+
+	editGroup := items.Group("").Use(requireRole(manager, admin))
+	editGroup.POST("", handlerV1.CreateItem)
+	editGroup.PUT("/:id", handlerV1.UpdateItem)
+
+	sudoGroup := items.Group("").Use(requireRole(admin))
+	sudoGroup.DELETE("/:id", handlerV1.DeleteItem)
 
 	return handler
 
@@ -53,11 +67,11 @@ func authJWT(service service.AuthService) gin.HandlerFunc {
 
 		if authHeader != "" {
 			parts := strings.Split(authHeader, " ")
-			if len(parts) == 2 {
+			if len(parts) == 2 && strings.EqualFold(parts[0], "Bearer") {
 				tokenString = parts[1]
 			}
 		} else {
-			if cookie, err := c.Cookie("token"); err == nil {
+			if cookie, err := c.Cookie("token"); err == nil && cookie != "" {
 				tokenString = cookie
 			}
 		}
@@ -74,11 +88,14 @@ func authJWT(service service.AuthService) gin.HandlerFunc {
 			return
 		}
 
-		userID, _ := strconv.ParseInt(claims.Subject, 10, 64)
+		userID, err := strconv.ParseInt(claims.Subject, 10, 64)
+		if err != nil {
+			v1.RespondError(c, errs.ErrInvalidUserID)
+			return
+		}
 
-		ctx := context.WithValue(c.Request.Context(), "userID", userID)
-		ctx = context.WithValue(ctx, "role", claims.Role)
-		c.Request = c.Request.WithContext(ctx)
+		c.Set("userID", userID)
+		c.Set("role", claims.Role)
 
 		c.Next()
 
@@ -86,23 +103,23 @@ func authJWT(service service.AuthService) gin.HandlerFunc {
 
 }
 
-func RequireRole(allowed ...string) gin.HandlerFunc {
+func requireRole(allowed ...string) gin.HandlerFunc {
 
 	return func(c *ginext.Context) {
 
-		role := c.Request.Context().Value("role")
-		if role == nil {
+		role, exists := c.Get("role")
+		if !exists {
 			v1.RespondError(c, errs.ErrInvalidToken)
 			return
 		}
 
-		userRole := role.(string)
-		if slices.Contains(allowed, userRole) {
-			c.Next()
+		userRole, ok := role.(string)
+		if !ok || !slices.Contains(allowed, userRole) {
+			v1.RespondError(c, errs.ErrInsufficientPermissions)
 			return
 		}
 
-		v1.RespondError(c, errors.New("insufficient permissions"))
+		c.Next()
 
 	}
 

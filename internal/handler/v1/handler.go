@@ -1,5 +1,3 @@
-// Package v1 provides version 1 of the Atlas API handlers for notifications.
-// It includes endpoints to create, query, and cancel notifications via HTTP.
 package v1
 
 import (

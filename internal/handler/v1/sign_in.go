@@ -15,8 +15,9 @@ func (h *Handler) SignIn(c *ginext.Context) {
 		return
 	}
 
-	user, err := h.service.GetUser(c.Request.Context(),
-		models.User{Login: request.Login, Password: request.Password})
+	user, err := h.service.GetUser(c.Request.Context(), models.User{
+		Login:    request.Login,
+		Password: request.Password})
 	if err != nil {
 		RespondError(c, err)
 		return

@@ -8,19 +8,20 @@ import (
 
 type AuthService struct {
 	logger  logger.Logger
-	config  config.Service
+	config  config.Auth
 	storage repository.AuthStorage
 }
 
-func NewAuthService(logger logger.Logger, config config.Service, storage repository.AuthStorage) *AuthService {
+func NewAuthService(logger logger.Logger, config config.Auth, storage repository.AuthStorage) *AuthService {
 	return &AuthService{logger: logger, config: config, storage: storage}
 }
 
 type CoreService struct {
 	logger  logger.Logger
+	config  config.Core
 	storage repository.CoreStorage
 }
 
-func NewCoreService(logger logger.Logger, storage repository.CoreStorage) *CoreService {
-	return &CoreService{logger: logger, storage: storage}
+func NewCoreService(logger logger.Logger, config config.Core, storage repository.CoreStorage) *CoreService {
+	return &CoreService{logger: logger, config: config, storage: storage}
 }

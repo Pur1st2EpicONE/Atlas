@@ -3,44 +3,47 @@ package errs
 import "errors"
 
 var (
-	ErrInvalidJSON = errors.New("invalid JSON format") // invalid JSON format
+	ErrInvalidJSON               = errors.New("invalid JSON format")                                // invalid JSON format
+	ErrEmptyLogin                = errors.New("login field cannot be empty")                        // login field cannot be empty
+	ErrEmptyPassword             = errors.New("password field cannot be empty")                     // password field cannot be empty
+	ErrEmptyRole                 = errors.New("role field cannot be empty")                         // role field cannot be empty
+	ErrInvalidRole               = errors.New("only admin, maganer and viewer roles are availible") // only admin, maganer and viewer roles are availible
+	ErrPasswordTooLong           = errors.New("password is too long")                               // password is too long
+	ErrPasswordTooShort          = errors.New("password is too short")                              // password is too short
+	ErrLoginTooShort             = errors.New("login is too short")                                 // login is too short
+	ErrLoginTooLong              = errors.New("login is too long")                                  // login is too long
+	ErrLoginInvalidFormat        = errors.New("login contains invalid characters")                  // login contains invalid characters
+	ErrMissingItemName           = errors.New("item name is required")                              // item name is required
+	ErrItemNameTooShort          = errors.New("item name is too short")                             // item name is too short
+	ErrItemNameTooLong           = errors.New("item name is too long")                              // item name is too long
+	ErrItemDescriptionTooLong    = errors.New("item description is too long")                       // item description is too long
+	ErrItemQuantityTooLow        = errors.New("quantity must be at least 1")                        // quantity must be at least 1
+	ErrItemQuantityTooHigh       = errors.New("quantity is too large")                              // quantity is too large
+	ErrNegativeItemPrice         = errors.New("price cannot be negative")                           // price cannot be negative
+	ErrItemZeroPrice             = errors.New("price cannot be zero")                               // price cannot be zero
+	ErrItemPriceTooLarge         = errors.New("price is too high")                                  // price is too high
+	ErrItemPriceInvalidPrecision = errors.New("price must have at most 2 decimal places")           // price must have at most 2 decimal places
 
-	ErrMissingDate = errors.New("event date is required")                              // event date is required
-	ErrInvalidDate = errors.New("invalid event date format, expected RFC3339")         // invalid event date format, expected RFC3339
-	ErrDateInPast  = errors.New("event date cannot be in the past")                    // event date cannot be in the past
-	ErrDateTooFar  = errors.New("event date cannot be more than 1 year in the future") // event date cannot be more than 1 year in the future
-	ErrDateTooSoon = errors.New("event date must be at least 24 hours in the future")  // event date must be at least 24 hours in the future
+	ErrMissingRequiredField = errors.New("missing required field")      // missing required field
+	ErrInvalidFieldFormat   = errors.New("invalid field format")        // invalid field format
+	ErrInvalidUserID        = errors.New("invalid userID")              // invalid userID
+	ErrInvalidItemID        = errors.New("item_id is empty or invalid") // item_id is empty or invalid
 
-	ErrMissingTitle       = errors.New("event title is required")                                     // event title is required
-	ErrTitleTooShort      = errors.New("event title must be at least 3 characters long")              // event title must be at least 3 characters long
-	ErrTitleTooLong       = errors.New("event title exceeds maximum length of 100 characters")        // event title exceeds maximum length of 100 characters
-	ErrDescriptionTooLong = errors.New("event description exceeds maximum length of 1000 characters") // event description exceeds maximum length of 1000 characters
-	ErrBookingTTLTooLong  = errors.New("booking TTL is too long: maximum 1 day")                      // booking TTL is too long: maximum 1 day
-	ErrBookingTTLTooShort = errors.New("booking TTL is too short: minimum 1 minute")                  // booking TTL is too short: minimum 1 minute
-
-	ErrInvalidSeatCount = errors.New("total seats must be greater than zero")       // total seats must be greater than zero
-	ErrTooManySeats     = errors.New("total seats exceeds maximum allowed of 1000") // total seats exceeds maximum allowed of 1000
-
-	ErrInternal                = errors.New("internal server error")    // internal server error
-	ErrInsufficientPermissions = errors.New("insufficient permissions") // insufficient permissions
-
-	ErrUserAlreadyExists  = errors.New("user already exists")                 // user already exists
-	ErrPasswordTooLong    = errors.New("password is too long")                // password is too long
-	ErrInvalidCredentials = errors.New("invalid login or password")           // invalid login or password
-	ErrEmptyLogin         = errors.New("login field can not be empty")        // login field can not be empty
-	ErrEmptyPassword      = errors.New("password field can not be empty")     // password field can not be empty
 	ErrEmptyAuthHeader    = errors.New("authorization header is empty")       // authorization header is empty
 	ErrInvalidAuthHeader  = errors.New("invalid authorization header format") // invalid authorization header format
 	ErrInvalidToken       = errors.New("invalid or expired token")            // invalid or expired token
-	ErrInvalidUserID      = errors.New("invalid userID")                      // invalid userID
+	ErrInvalidCredentials = errors.New("invalid login or password")           // invalid login or password
 
-	ErrInvalidEventID = errors.New("event_id is empty or invalid") // event_id is empty or invalid
-	ErrEventFull      = errors.New("event is full: no seats left") // event is full: no seats left
-	ErrEventNotFound  = errors.New("event not found")              // event not found
+	ErrInsufficientPermissions = errors.New("insufficient permissions")            // insufficient permissions
+	ErrActionNotAllowedForRole = errors.New("action not allowed for current role") // action not allowed for current role
 
-	ErrBookingAlreadyExists = errors.New("booking already exists for this user and event") // booking already exists for this user and event
-	ErrAlreadyConfirmed     = errors.New("booking is already confirmed")                   // booking is already confirmed
-	ErrInvalidBookingTTL    = errors.New("invalid booking expiration time")                // invalid booking expiration time
-	ErrBookingExpired       = errors.New("booking has expired")                            // booking has expired
-	ErrBookingNotFound      = errors.New("booking not found")                              // booking not found
+	ErrUserNotFound     = errors.New("user not found")     // user not found
+	ErrItemNotFound     = errors.New("item not found")     // item not found
+	ErrResourceNotFound = errors.New("resource not found") // resource not found
+
+	ErrUserAlreadyExists      = errors.New("user already exists")                // user already exists
+	ErrItemAlreadyExists      = errors.New("item with this name already exists") // item with this name already exists
+	ErrCannotDeleteActiveItem = errors.New("cannot delete active/used item")     // cannot delete active/used item
+
+	ErrInternal = errors.New("internal server error") // internal server error
 )

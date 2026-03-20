@@ -3,6 +3,7 @@ package postgres
 import (
 	"Atlas/internal/models"
 	"context"
+	"fmt"
 
 	"github.com/wb-go/wbf/retry"
 )
@@ -23,7 +24,7 @@ func (s *AuthStorage) CreateUser(ctx context.Context, user models.User) (int64, 
 
 	err = row.Scan(&userID)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("failed to scan row: %w", err)
 	}
 
 	return userID, nil

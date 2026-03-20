@@ -31,8 +31,8 @@ local:
 	if [ ! -f .env ]; then cat .env.example > .env; fi 
 	if [ ! -f config.yaml ]; then cp ./configs/config.dev.yaml ./config.yaml; fi 
 	if [ ! -f docker-compose.yaml ]; then cp ./deployments/docker-compose.dev.yaml ./docker-compose.yaml; fi
-	docker compose up -d postgres rabbitmq
-	until docker exec rabbitmq rabbitmqctl status > /dev/null 2>&1; do sleep 0.5; done
+	docker compose up -d postgres
+	until docker exec postgres pg_isready -U ${DB_USER} > /dev/null 2>&1; do sleep 1; done
 	bash -c 'trap "exit 0" INT; go run ./cmd/atlas/main.go'
 
 migrate-up:

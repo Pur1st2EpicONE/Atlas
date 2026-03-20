@@ -1,5 +1,9 @@
 package v1
 
+import (
+	"github.com/shopspring/decimal"
+)
+
 type RegisterDTO struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
@@ -11,11 +15,16 @@ type LoginDTO struct {
 	Password string `json:"password"`
 }
 
-type CreateEventDTO struct {
-	ID          string `json:"event_id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Date        string `json:"date"`
-	Seats       int    `json:"seats"`
-	BookingTTL  string `json:"booking_ttl"`
+type CreateItemDTO struct {
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Quantity    int             `json:"quantity"`
+	Price       decimal.Decimal `json:"price"`
+}
+
+type UpdateItemDTO struct {
+	Name        *string          `json:"name"`
+	Description *string          `json:"description"`
+	Quantity    *int             `json:"quantity"`
+	Price       *decimal.Decimal `json:"price"`
 }

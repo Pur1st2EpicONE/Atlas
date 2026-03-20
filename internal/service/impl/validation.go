@@ -3,14 +3,80 @@ package impl
 import (
 	"Atlas/internal/errs"
 	"Atlas/internal/models"
-	"strings"
-	"time"
+
+	"github.com/shopspring/decimal"
 )
 
-const minBookingTTL = 1 * time.Minute
-const maxBookingTTL = 24 * time.Hour
+const bcryptMaxLen = 72
 
-func validateUser(user models.User) error {
+func (a *AuthService) validateNewUser(user models.User) error {
+
+	if err := a.validateLogin(user.Login); err != nil {
+		return err
+	}
+	if err := a.validatePassword(user.Password); err != nil {
+		return err
+	}
+	if err := a.validateRole(user.Role); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *AuthService) validateLogin(login string) error {
+
+	length := len(login)
+
+	if length == 0 {
+		return errs.ErrEmptyLogin
+	}
+	if length < a.config.MinLoginLength {
+		return errs.ErrLoginTooShort
+	}
+	if length > a.config.MaxLoginLength {
+		return errs.ErrLoginTooLong
+	}
+
+	return nil
+
+}
+
+func (a *AuthService) validatePassword(password string) error {
+
+	length := len(password)
+
+	if length == 0 {
+		return errs.ErrEmptyPassword
+	}
+	if length < a.config.MinPasswordLength {
+		return errs.ErrPasswordTooShort
+	}
+	if length > bcryptMaxLen {
+		return errs.ErrPasswordTooLong
+	}
+
+	return nil
+
+}
+
+func (a *AuthService) validateRole(role string) error {
+
+	if role == "" {
+		return errs.ErrEmptyRole
+	}
+
+	if role != models.Admin &&
+		role != models.Manager &&
+		role != models.Viewer {
+		return errs.ErrInvalidRole
+	}
+
+	return nil
+
+}
+
+func (a *AuthService) validateUser(user models.User) error {
 	if user.Login == "" {
 		return errs.ErrEmptyLogin
 	}
@@ -20,99 +86,73 @@ func validateUser(user models.User) error {
 	return nil
 }
 
-func validateEvent(event *models.Event) error {
+func (s *CoreService) validateItem(item models.Item) error {
 
-	if err := validateTitle(event.Title); err != nil {
+	if err := s.validateName(item.Name); err != nil {
 		return err
 	}
-
-	if err := validateDescription(event.Description); err != nil {
+	if err := s.validateDescription(item.Description); err != nil {
 		return err
 	}
-
-	if err := validateDate(event.Date); err != nil {
+	if err := s.validateQuantity(item.Quantity); err != nil {
 		return err
 	}
-
-	if err := validateSeats(event.Seats); err != nil {
+	if err := s.validatePrice(item.Price); err != nil {
 		return err
-	}
-
-	if err := validateBookingTTL(event.BookingTTL); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func validateTitle(title string) error {
-
-	title = strings.TrimSpace(title)
-
-	if title == "" {
-		return errs.ErrMissingTitle
-	}
-
-	if len(title) < 3 {
-		return errs.ErrTitleTooShort
-	}
-
-	if len(title) > 200 {
-		return errs.ErrTitleTooLong
 	}
 
 	return nil
 
 }
 
-func validateDescription(desc string) error {
-	if len(desc) > 2000 {
-		return errs.ErrDescriptionTooLong
+func (s *CoreService) validateName(name string) error {
+
+	length := len(name)
+
+	if length == 0 {
+		return errs.ErrMissingItemName
 	}
-	return nil
-}
-
-func validateDate(t time.Time) error {
-
-	if t.IsZero() {
-		return errs.ErrMissingDate
+	if length < s.config.MinItemNameLength {
+		return errs.ErrItemNameTooShort
 	}
-
-	now := time.Now().UTC()
-
-	if t.Before(now) {
-		return errs.ErrDateInPast
-	}
-	if t.Before(now.Add(24 * time.Hour)) {
-		return errs.ErrDateTooSoon
-	}
-
-	if t.After(now.AddDate(1, 0, 0)) {
-		return errs.ErrDateTooFar
+	if length > s.config.MaxItemNameLength {
+		return errs.ErrItemNameTooLong
 	}
 
 	return nil
 
 }
 
-func validateSeats(seats int) error {
-	if seats <= 0 {
-		return errs.ErrInvalidSeatCount
-	}
-	if seats > 10000 {
-		return errs.ErrTooManySeats
+func (s *CoreService) validateDescription(description string) error {
+	if len(description) > s.config.MaxItemDescriptionLength {
+		return errs.ErrItemDescriptionTooLong
 	}
 	return nil
 }
 
-func validateBookingTTL(ttl time.Duration) error {
-
-	if ttl < minBookingTTL {
-		return errs.ErrBookingTTLTooShort
+func (s *CoreService) validateQuantity(quantity int) error {
+	if quantity < s.config.MinItemQuantity {
+		return errs.ErrItemQuantityTooLow
 	}
+	if quantity > s.config.MaxItemQuantity {
+		return errs.ErrItemQuantityTooHigh
+	}
+	return nil
+}
 
-	if ttl > maxBookingTTL {
-		return errs.ErrBookingTTLTooLong
+func (s *CoreService) validatePrice(price decimal.Decimal) error {
+
+	if price.IsNegative() {
+		return errs.ErrNegativeItemPrice
+	}
+	if price.IsZero() {
+		return errs.ErrItemZeroPrice
+	}
+	if price.GreaterThan(decimal.NewFromInt(s.config.MaxItemPrice)) {
+		return errs.ErrItemPriceTooLarge
+	}
+	if price.Sub(price.Truncate(2)).Equal(decimal.Zero) == false {
+		return errs.ErrItemPriceInvalidPrecision
 	}
 
 	return nil
