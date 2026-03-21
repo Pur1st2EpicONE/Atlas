@@ -15,7 +15,13 @@ func (h *Handler) GetItemHistory(c *ginext.Context) {
 		return
 	}
 
-	history, err := h.service.GetItemHistory(c.Request.Context(), itemID)
+	filter, err := parseQuery(c)
+	if err != nil {
+		RespondError(c, err)
+		return
+	}
+
+	history, err := h.service.GetItemHistory(c.Request.Context(), itemID, filter)
 	if err != nil {
 		RespondError(c, err)
 		return

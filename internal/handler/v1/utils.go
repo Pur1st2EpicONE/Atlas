@@ -2,12 +2,18 @@ package v1
 
 import (
 	"Atlas/internal/errs"
+	"Atlas/internal/models"
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/wb-go/wbf/ginext"
 )
+
+const defaultLimit = 100
 
 func getUserID(c *ginext.Context) (int64, error) {
 	val, found := c.Get("userID")
@@ -23,6 +29,86 @@ func getRole(c *ginext.Context) (string, error) {
 		return "", errs.ErrInvalidToken
 	}
 	return val.(string), nil
+}
+
+func parseQuery(c *ginext.Context) (models.HistoryFilter, error) {
+
+	filter := models.HistoryFilter{Limit: defaultLimit}
+
+	if fromStr := c.Query("from"); fromStr != "" {
+		from, err := parseTime(fromStr)
+		if err != nil {
+			return models.HistoryFilter{}, err
+		}
+		filter.From = from
+	}
+
+	if toStr := c.Query("to"); toStr != "" {
+		to, err := parseTime(toStr)
+		if err != nil {
+			return models.HistoryFilter{}, err
+		}
+		filter.To = to
+	}
+
+	if userStr := c.Query("user"); userStr != "" {
+		userID, err := strconv.ParseInt(userStr, 10, 64)
+		if err != nil || userID <= 0 {
+			return models.HistoryFilter{}, errs.ErrInvalidUserID
+		}
+		filter.UserID = userID
+	}
+
+	if action := c.Query("action"); action != "" {
+		action = strings.ToUpper(strings.TrimSpace(action))
+		switch action {
+		case "INSERT", "UPDATE", "DELETE":
+			filter.Action = action
+		default:
+			return models.HistoryFilter{}, errs.ErrInvalidAction
+		}
+	}
+
+	if limStr := c.Query("limit"); limStr != "" {
+		limit, err := strconv.Atoi(limStr)
+		if err != nil {
+			return models.HistoryFilter{}, errs.ErrInvalidLimit
+		}
+		if limit < 1 {
+			limit = 1
+		}
+		if limit > 2000 {
+			limit = 2000
+		}
+		filter.Limit = limit
+	}
+
+	return filter, nil
+
+}
+
+func parseTime(timeStr string) (time.Time, error) {
+	if timeStr == "" {
+		return time.Time{}, errs.ErrMissingDate
+	}
+
+	layouts := []string{
+		time.RFC3339,
+		"2006-01-02T15:04:05",
+		"2006-01-02",
+		"2006-01-02T15:04:05-07:00",
+		"2006-01-02T15:04:05Z07:00",
+	}
+
+	for _, layout := range layouts {
+		to, err := time.Parse(layout, timeStr)
+		if err == nil {
+			return to.UTC(), nil
+		}
+	}
+
+	return time.Time{}, errs.ErrInvalidDate
+
 }
 
 func respondOK(c *ginext.Context, response any) {
@@ -64,6 +150,11 @@ func mapErrorToStatus(err error) (int, string) {
 		errors.Is(err, errs.ErrMissingRequiredField),
 		errors.Is(err, errs.ErrInvalidFieldFormat),
 		errors.Is(err, errs.ErrInvalidUserID),
+		errors.Is(err, errs.ErrMissingDate),
+		errors.Is(err, errs.ErrInvalidDate),
+		errors.Is(err, errs.ErrInvalidDateRange),
+		errors.Is(err, errs.ErrInvalidLimit),
+		errors.Is(err, errs.ErrInvalidAction),
 		errors.Is(err, errs.ErrInvalidItemID):
 		return http.StatusBadRequest, err.Error()
 

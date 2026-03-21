@@ -9,7 +9,7 @@ import (
 )
 
 func (s *CoreService) GetItem(ctx context.Context, itemID int64) (models.Item, error) {
-	item, err := s.storage.GetItemByID(ctx, itemID)
+	item, err := s.storage.GetItem(ctx, itemID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return models.Item{}, errs.ErrItemNotFound

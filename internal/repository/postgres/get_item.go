@@ -8,7 +8,7 @@ import (
 	"github.com/wb-go/wbf/retry"
 )
 
-func (s *CoreStorage) GetItemByID(ctx context.Context, id int64) (models.Item, error) {
+func (s *CoreStorage) GetItem(ctx context.Context, id int64) (models.Item, error) {
 
 	var item models.Item
 

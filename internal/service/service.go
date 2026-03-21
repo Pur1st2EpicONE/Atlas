@@ -25,7 +25,7 @@ type CoreService interface {
 	DeleteItem(ctx context.Context, userID int64, itemID int64) error
 	GetItem(ctx context.Context, itemID int64) (models.Item, error)
 	GetItems(ctx context.Context) ([]models.Item, error)
-	GetItemHistory(ctx context.Context, itemID int64) ([]models.ItemHistory, error)
+	GetItemHistory(ctx context.Context, itemID int64, filter models.HistoryFilter) ([]models.ItemHistory, error)
 }
 
 type Service struct {

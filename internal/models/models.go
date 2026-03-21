@@ -51,3 +51,11 @@ type ItemHistory struct {
 	OldData   json.RawMessage `json:"old_data,omitempty"`
 	NewData   json.RawMessage `json:"new_data,omitempty"`
 }
+
+type HistoryFilter struct {
+	From   time.Time
+	To     time.Time
+	UserID int64
+	Action string
+	Limit  int
+}

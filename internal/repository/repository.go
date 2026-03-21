@@ -20,11 +20,11 @@ type AuthStorage interface {
 type CoreStorage interface {
 	CreateItem(tx *sql.Tx, ctx context.Context, item models.Item) (models.Item, error)
 	DeleteItem(tx *sql.Tx, ctx context.Context, itemID int64) error
+	GetItem(ctx context.Context, itemID int64) (models.Item, error)
 	GetItems(ctx context.Context) ([]models.Item, error)
-	GetItemByID(ctx context.Context, itemID int64) (models.Item, error)
 	GetItemForUpdate(tx *sql.Tx, ctx context.Context, itemID int64) (models.Item, error)
 	UpdateItem(tx *sql.Tx, ctx context.Context, itemID int64, updatedItem models.Item) error
-	GetItemHistory(ctx context.Context, itemID int64) ([]models.ItemHistory, error)
+	GetItemHistory(ctx context.Context, itemID int64, filter models.HistoryFilter) ([]models.ItemHistory, error)
 	Transaction(ctx context.Context, fn func(tx *sql.Tx, ctx context.Context) error) error
 	Close()
 }

@@ -158,3 +158,13 @@ func (s *CoreService) validatePrice(price decimal.Decimal) error {
 	return nil
 
 }
+
+func (s *CoreService) validateFilter(filter models.HistoryFilter) error {
+
+	if !filter.From.IsZero() && !filter.To.IsZero() && filter.From.After(filter.To) {
+		return errs.ErrInvalidDateRange
+	}
+
+	return nil
+
+}

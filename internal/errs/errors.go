@@ -45,5 +45,10 @@ var (
 	ErrItemAlreadyExists      = errors.New("item with this name already exists") // item with this name already exists
 	ErrCannotDeleteActiveItem = errors.New("cannot delete active/used item")     // cannot delete active/used item
 
-	ErrInternal = errors.New("internal server error") // internal server error
+	ErrInternal         = errors.New("internal server error")                               // internal server error
+	ErrMissingDate      = errors.New("missing date")                                        // missing date
+	ErrInvalidDate      = errors.New("invalid date format, expected RFC3339 or YYYY-MM-DD") // invalid date format, expected RFC3339 or YYYY-MM-DD
+	ErrInvalidDateRange = errors.New("from date must be before or equal to to date")        // from date must be before or equal to to date
+	ErrInvalidLimit     = errors.New("invalid limit")                                       // invalid limit
+	ErrInvalidAction    = errors.New("invalid action")                                      // invalid action
 )

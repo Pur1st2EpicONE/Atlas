@@ -10,7 +10,7 @@ import (
 
 type Claims struct {
 	jwt.StandardClaims
-	Role string `json:"role"`
+	Role string
 }
 
 func (a *AuthService) CreateToken(user models.User) (string, error) {

@@ -51,21 +51,22 @@ type Core struct {
 }
 
 type Storage struct {
-	Dialect            string             `mapstructure:"goose_dialect"`              // Goose migration dialect
-	MigrationsDir      string             `mapstructure:"goose_migrations_directory"` // Directory for Goose migrations
-	Host               string             `mapstructure:"host"`                       // DB host
-	Port               string             `mapstructure:"port"`                       // DB port
-	Username           string             `mapstructure:"username"`                   // DB username
-	Password           string             `mapstructure:"password"`                   // DB password
-	DBName             string             `mapstructure:"dbname"`                     // database name
-	SSLMode            string             `mapstructure:"sslmode"`                    // SSL mode
-	MaxOpenConns       int                `mapstructure:"max_open_conns"`             // maximum open connections
-	MaxIdleConns       int                `mapstructure:"max_idle_conns"`             // maximum idle connections
-	ConnMaxLifetime    time.Duration      `mapstructure:"conn_max_lifetime"`          // max lifetime per connection
-	QueryRetryStrategy QueryRetryStrategy `mapstructure:"query_retry_strategy"`       // query retry strategy
+	Dialect            string        `mapstructure:"goose_dialect"`              // Goose migration dialect
+	MigrationsDir      string        `mapstructure:"goose_migrations_directory"` // Directory for Goose migrations
+	Host               string        `mapstructure:"host"`                       // DB host
+	Port               string        `mapstructure:"port"`                       // DB port
+	Username           string        `mapstructure:"username"`                   // DB username
+	Password           string        `mapstructure:"password"`                   // DB password
+	DBName             string        `mapstructure:"dbname"`                     // database name
+	SSLMode            string        `mapstructure:"sslmode"`                    // SSL mode
+	MaxOpenConns       int           `mapstructure:"max_open_conns"`             // maximum open connections
+	MaxIdleConns       int           `mapstructure:"max_idle_conns"`             // maximum idle connections
+	ConnMaxLifetime    time.Duration `mapstructure:"conn_max_lifetime"`          // max lifetime per connection
+	QueryRetryStrategy RetryStrategy `mapstructure:"query_retry_strategy"`       // query retry strategy
+	TxRetryStrategy    RetryStrategy `mapstructure:"tx_retry_strategy"`          // transaction retry strategy
 }
 
-type QueryRetryStrategy struct {
+type RetryStrategy struct {
 	Attempts int           `mapstructure:"attempts"`
 	Delay    time.Duration `mapstructure:"delay"`
 	Backoff  float64       `mapstructure:"backoff"`

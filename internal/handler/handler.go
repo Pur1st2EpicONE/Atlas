@@ -3,6 +3,7 @@ package handler
 import (
 	"Atlas/internal/config"
 	"Atlas/internal/errs"
+	"Atlas/internal/models"
 	"Atlas/internal/service"
 	"Atlas/internal/service/impl"
 	"net/http"
@@ -17,12 +18,7 @@ import (
 	"github.com/wb-go/wbf/ginext"
 )
 
-const (
-	header  = "Authorization"
-	viewer  = "viewer"
-	manager = "manager"
-	admin   = "admin"
-)
+const header = "Authorization"
 
 func NewHandler(config config.Server, service *service.Service) http.Handler {
 
@@ -42,16 +38,16 @@ func NewHandler(config config.Server, service *service.Service) http.Handler {
 
 	items := protected.Group("/items")
 
-	viewGroup := items.Group("").Use(requireRole(viewer, manager, admin))
+	viewGroup := items.Group("").Use(requireRole(models.Viewer, models.Manager, models.Admin))
 	viewGroup.GET("", handlerV1.GetItems)
 	viewGroup.GET("/:id", handlerV1.GetItem)
-	viewGroup.GET("/:id/history", handlerV1.GetItemHistory)
 
-	editGroup := items.Group("").Use(requireRole(manager, admin))
+	editGroup := items.Group("").Use(requireRole(models.Manager, models.Admin))
 	editGroup.POST("", handlerV1.CreateItem)
 	editGroup.PUT("/:id", handlerV1.UpdateItem)
 
-	sudoGroup := items.Group("").Use(requireRole(admin))
+	sudoGroup := items.Group("").Use(requireRole(models.Admin))
+	sudoGroup.GET("/:id/history", handlerV1.GetItemHistory)
 	sudoGroup.DELETE("/:id", handlerV1.DeleteItem)
 
 	return handler
