@@ -207,7 +207,6 @@ func respondOK(c *ginext.Context, response any) {
 
 func RespondError(c *ginext.Context, err error) {
 	if err != nil {
-		fmt.Println(err)
 		status, msg := mapErrorToStatus(err)
 		c.AbortWithStatusJSON(status, ginext.H{"error": msg})
 	}

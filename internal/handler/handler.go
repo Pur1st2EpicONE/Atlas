@@ -6,6 +6,7 @@ import (
 	"Atlas/internal/models"
 	"Atlas/internal/service"
 	"Atlas/internal/service/impl"
+	"html/template"
 	"net/http"
 	"slices"
 	"strconv"
@@ -18,13 +19,22 @@ import (
 	"github.com/wb-go/wbf/ginext"
 )
 
-const header = "Authorization"
+const (
+	indexPath  = "web/templates/index.html"
+	loginPath  = "web/templates/login.html"
+	signupPath = "web/templates/signup.html"
+	header     = "Authorization"
+)
 
 func NewHandler(config config.Server, service *service.Service) http.Handler {
 
 	handler := ginext.New("")
 	handler.Use(ginext.Recovery())
 	handler.Static("/static", "./web/static")
+
+	handler.GET("/", renderPage(template.Must(template.ParseFiles(indexPath))))
+	handler.GET("/login", renderPage(template.Must(template.ParseFiles(loginPath))))
+	handler.GET("/signup", renderPage(template.Must(template.ParseFiles(signupPath))))
 
 	apiV1 := handler.Group("/api/v1")
 	handlerV1 := v1.NewHandler(config, *service)
@@ -52,6 +62,15 @@ func NewHandler(config config.Server, service *service.Service) http.Handler {
 
 	return handler
 
+}
+
+func renderPage(tmpl *template.Template) gin.HandlerFunc {
+	return func(c *ginext.Context) {
+		c.Header("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.Execute(c.Writer, nil); err != nil {
+			c.String(http.StatusInternalServerError, errs.ErrInternal.Error())
+		}
+	}
 }
 
 func authJWT(service service.AuthService) gin.HandlerFunc {
