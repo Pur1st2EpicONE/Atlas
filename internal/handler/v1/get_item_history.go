@@ -27,6 +27,6 @@ func (h *Handler) GetItemHistory(c *ginext.Context) {
 		return
 	}
 
-	respondOK(c, history)
+	fmtRespond(c, history)
 
 }
