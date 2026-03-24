@@ -8,14 +8,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>Atlas</h1>
-        <p class="note">Item Service</p>
 
-        <div class="nav-links">
-            <a href="/login" id="login-link">Sign In</a> |
-            <a href="/signup" id="signup-link">Sign Up</a>
-            <button id="signout-btn" style="display: none;">Sign Out</button>
-        </div>
+        <header class="app-header">
+            <div class="logo">
+                <h1>Atlas</h1>
+                <span class="note">Item Service</span>
+            </div>
+            <div class="nav-links">
+                <a href="/login" id="login-link">Sign In</a>
+                <a href="/signup" id="signup-link">Sign Up</a>
+                <button id="signout-btn" style="display: none;">Sign Out</button>
+            </div>
+        </header>
 
         <div id="dashboard" style="display: none;">
             <div class="user-info">
@@ -24,6 +28,14 @@
             </div>
 
             <button id="add-item-btn" class="btn-primary" style="display: none;">+ Add Item</button>
+
+            <div id="admin-history-search" style="display: none; margin: 20px 0 16px;">
+                <div class="search-row">
+                    <label>View History by Item ID:</label>
+                    <input type="number" id="search-item-id" placeholder="e.g. 123" min="1">
+                    <button onclick="viewHistoryById()" class="btn-primary">Open History</button>
+                </div>
+            </div>
 
             <table id="items-table" class="table">
                 <thead>

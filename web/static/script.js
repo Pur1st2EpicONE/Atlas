@@ -122,6 +122,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (currentRole === "manager" || currentRole === "admin") {
       addBtn.style.display = "inline-block";
     }
+    const adminSearchDiv = document.getElementById("admin-history-search");
+    if (adminSearchDiv) {
+      adminSearchDiv.style.display = currentRole === "admin" ? "block" : "none";
+    }
+    const itemsTable = document.getElementById("items-table");
+    if (itemsTable) {
+      itemsTable.classList.toggle("viewer-mode", currentRole === "viewer");
+    }
   }
 
   async function loadItems() {
@@ -382,6 +390,39 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       alert("Export error");
     }
+  };
+
+  window.viewHistoryById = async () => {
+    const input = document.getElementById("search-item-id");
+    const idStr = input.value.trim();
+    if (!idStr) {
+      alert("Please enter an Item ID");
+      return;
+    }
+    const id = parseInt(idStr, 10);
+    if (isNaN(id) || id < 1) {
+      alert("Invalid Item ID");
+      return;
+    }
+    let displayName = `#${id}`;
+    try {
+      const res = await fetch(`/api/v1/items/${id}`, {
+        headers: { Authorization: `Bearer ${currentToken}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.result && data.result.name) {
+          displayName = data.result.name;
+          if (data.result.deleted_at) {
+            displayName += " (deleted)";
+          }
+        }
+      }
+    } catch (e) {}
+
+    showHistory(id, displayName);
+
+    input.value = "";
   };
 
   window.closeModal = (id) => {
