@@ -15,7 +15,18 @@ server:
   shutdown_timeout: 10s                        # Timeout for graceful server shutdown
 
 service:
-  token_ttl: 30m
+  auth:
+    token_ttl: 30m
+    min_login_length: 3
+    max_login_length: 50
+    min_password_length: 5
+  core:
+    min_item_name_length: 2
+    max_item_name_length: 150
+    max_item_description_length: 2000
+    min_item_quantity: 1
+    max_item_quantity: 100000
+    max_item_price: 1000000
 
 # Database (PostgreSQL) configuration
 database:
@@ -30,5 +41,9 @@ database:
   conn_max_lifetime: 30m                       # Maximum lifetime of a database connection
   query_retry_strategy:
     attempts: 3                                # Number of retry attempts for failed DB queries
+    delay: 200ms                               # Initial delay between retries
+    backoff: 2                                 # Backoff multiplier for retry delay
+  tx_retry_strategy:
+    attempts: 3                                # Number of retry attempts for failed DB queries in transaction
     delay: 200ms                               # Initial delay between retries
     backoff: 2                                 # Backoff multiplier for retry delay

@@ -10,16 +10,16 @@ RUN go mod download
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -o kairos ./cmd/kairos
+    go build -o atlas ./cmd/atlas
 
 FROM scratch
 
 WORKDIR /app
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /app/kairos /app/kairos
+COPY --from=builder /app/atlas /app/atlas
 COPY migrations /app/migrations
 
 EXPOSE 8080
 
-ENTRYPOINT ["/app/kairos"]
+ENTRYPOINT ["/app/atlas"]
