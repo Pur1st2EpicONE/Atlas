@@ -42,19 +42,15 @@ migrate-down:
 	@if command -v goose > /dev/null 2>&1; then $(GOOSE_CMD) down; else echo "You need Goose migration tool to use this command!"; fi
 
 test:
-	cat .env.example > .env
-	cp ./configs/config.dev.yaml ./config.yaml
-	cp ./deployments/docker-compose.dev.yaml ./docker-compose.yaml
-	go test -cover ./internal/handler/v1/...
-	go test -cover ./internal/service/impl/...
-	docker compose -f docker-compose.yaml up -d postgres-test > /dev/null 2>&1
-	until docker exec postgres-test pg_isready -U ${DB_USER} > /dev/null 2>&1; do sleep 0.5; done
-	for i in $$(seq 1 10); do \
-		migrate -path ./migrations -database "postgres://${DB_USER}:${DB_PASSWORD}@localhost:5434/atlas_test?sslmode=disable" up > /dev/null 2>&1 && exit 0; sleep 1; \
-	done; exit 1
-	go test ./internal/repository/postgres -cover
-	docker compose -f docker-compose.yaml stop postgres-test > /dev/null 2>&1
-	docker compose -f docker-compose.yaml rm -f postgres-test > /dev/null 2>&1
+	if [ ! -f .env ]; then cat .env.example > .env	; fi 
+	if [ ! -f config.yaml ]; then cp ./configs/config.test.yaml ./config.yaml; fi 
+	if [ ! -f docker-compose.yaml ]; then cp ./deployments/docker-compose.test.yaml ./docker-compose.yaml; fi
+	COMPOSE_BAKE=true docker compose -f docker-compose.yaml up -d postgres-test
+	until docker exec postgres-test pg_isready -U ${DB_USER} -d atlas_test > /dev/null 2>&1; do sleep 0.5; done
+	echo "Running tests, please be patient (≈2 min)"
+	COMPOSE_BAKE=true docker compose -f docker-compose.yaml run --rm app-test > .temp 2>/dev/null
+	cat .temp; rm -f .temp
+	docker compose -f docker-compose.yaml down -v > /dev/null 2>&1
 	rm -f docker-compose.yaml config.yaml .env
 
 postgres:

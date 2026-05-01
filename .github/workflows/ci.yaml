@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_NAME: atlas_test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.1'
+
+      - name: Install golangci-lint
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Run golangci-lint
+        run: golangci-lint run ./...
+
+      - name: Prepare test environment
+        run: |
+          cp .env.example .env
+          cp ./configs/config.test.yaml ./config.yaml
+          cp ./deployments/docker-compose.test.yaml ./docker-compose.yaml
+
+      - name: Start postgres
+        run: |
+          docker compose up -d postgres-test
+          echo "Waiting for postgres..."
+          for i in $(seq 1 60); do
+            docker exec postgres-test pg_isready -U "$DB_USER" -d "$DB_NAME" && break
+            sleep 1
+          done || (docker logs postgres-test && exit 1)
+
+      - name: Run tests
+        run: |
+          docker compose run --rm app-test

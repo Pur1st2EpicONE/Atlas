@@ -29,7 +29,7 @@ func (s *CoreStorage) GetItemHistory(ctx context.Context, itemID int64, filter m
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var history []models.ItemHistory
 
@@ -88,7 +88,6 @@ func buildWhere(filter models.HistoryFilter) (string, []any) {
 	if filter.Action != "" {
 		conditions = append(conditions, fmt.Sprintf("action = $%d", argIdx))
 		args = append(args, filter.Action)
-		argIdx++
 	}
 
 	if len(conditions) == 0 {

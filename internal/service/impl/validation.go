@@ -151,7 +151,7 @@ func (s *CoreService) validatePrice(price decimal.Decimal) error {
 	if price.GreaterThan(decimal.NewFromInt(s.config.MaxItemPrice)) {
 		return errs.ErrItemPriceTooLarge
 	}
-	if price.Sub(price.Truncate(2)).Equal(decimal.Zero) == false {
+	if !price.Sub(price.Truncate(2)).Equal(decimal.Zero) {
 		return errs.ErrItemPriceInvalidPrecision
 	}
 
