@@ -7,6 +7,9 @@ import (
 	"github.com/wb-go/wbf/ginext"
 )
 
+// GetItemHistory handles GET /api/v1/items/:id/history requests.
+// It parses the item ID and query parameters (from, to, user_id, action, limit),
+// then returns the history records for that item.
 func (h *Handler) GetItemHistory(c *ginext.Context) {
 
 	itemID, err := strconv.ParseInt(c.Param("id"), 10, 64)

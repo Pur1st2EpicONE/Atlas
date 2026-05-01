@@ -5,6 +5,8 @@ import (
 	"context"
 )
 
+// GetItemHistory returns the modification history of an item,
+// applying the provided filter (time range, user, action, limit).
 func (s *CoreService) GetItemHistory(ctx context.Context, itemID int64, filter models.HistoryFilter) ([]models.ItemHistory, error) {
 
 	if err := s.validateFilter(filter); err != nil {

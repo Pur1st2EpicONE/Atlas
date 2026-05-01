@@ -7,6 +7,9 @@ import (
 	"github.com/wb-go/wbf/ginext"
 )
 
+// CreateItem handles POST /api/v1/items requests.
+// It binds JSON, validates the user, and creates a new item.
+// On success, it returns the created item.
 func (h *Handler) CreateItem(c *ginext.Context) {
 
 	var request CreateItemDTO

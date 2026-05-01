@@ -8,6 +8,10 @@ import (
 	"github.com/wb-go/wbf/ginext"
 )
 
+// UpdateItem handles PUT /api/v1/items/:id requests.
+// It parses the item ID and the update fields from the JSON body,
+// then applies the changes. Only fields that are non-nil are updated.
+// Returns a success status message on completion.
 func (h *Handler) UpdateItem(c *ginext.Context) {
 
 	var request UpdateItemDTO

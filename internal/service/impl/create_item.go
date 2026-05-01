@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+// CreateItem validates the item, sets the current user ID in the transaction,
+// and delegates creation to the storage layer. Returns the created item.
 func (s *CoreService) CreateItem(ctx context.Context, userID int64, item models.Item) (models.Item, error) {
 
 	if err := s.validateItem(item); err != nil {

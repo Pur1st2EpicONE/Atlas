@@ -10,6 +10,7 @@ import (
 	"github.com/wb-go/wbf/retry"
 )
 
+// GetItemHistory returns historical change records for an item, filtered by the provided filter.
 func (s *CoreStorage) GetItemHistory(ctx context.Context, itemID int64, filter models.HistoryFilter) ([]models.ItemHistory, error) {
 
 	where, args := buildWhere(filter)
@@ -61,6 +62,8 @@ func (s *CoreStorage) GetItemHistory(ctx context.Context, itemID int64, filter m
 
 }
 
+// buildWhere constructs the WHERE clause and arguments for the history query.
+// It filters by From, To, UserID, and Action if present in filter.
 func buildWhere(filter models.HistoryFilter) (string, []any) {
 
 	var conditions []string

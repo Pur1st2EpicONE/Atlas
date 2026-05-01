@@ -9,6 +9,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// CreateUser validates new user data, hashes the password,
+// and stores the user in the database. Returns the new user ID.
 func (a *AuthService) CreateUser(ctx context.Context, user models.User) (int64, error) {
 
 	if err := a.validateNewUser(user); err != nil {

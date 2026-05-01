@@ -8,6 +8,8 @@ import (
 	"github.com/wb-go/wbf/retry"
 )
 
+// CreateUser inserts a new user record into the database.
+// It returns the auto-generated user ID.
 func (s *AuthStorage) CreateUser(ctx context.Context, user models.User) (int64, error) {
 
 	var userID int64

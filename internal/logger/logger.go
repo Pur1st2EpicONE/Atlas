@@ -1,3 +1,6 @@
+// Package logger provides a structured logging interface and the ability to create
+// a logger instance based on application configuration. It abstracts the underlying
+// logging implementation and discards goose migration logs.
 package logger
 
 import (

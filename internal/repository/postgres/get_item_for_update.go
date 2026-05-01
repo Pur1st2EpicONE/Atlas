@@ -6,6 +6,8 @@ import (
 	"database/sql"
 )
 
+// GetItemForUpdate retrieves an item by ID with a row lock for update within a transaction.
+// It is used to prevent concurrent modifications.
 func (s *CoreStorage) GetItemForUpdate(tx *sql.Tx, ctx context.Context, itemID int64) (models.Item, error) {
 
 	var item models.Item

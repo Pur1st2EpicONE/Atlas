@@ -10,6 +10,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// GetUser validates the allegedUser's login/password, retrieves the real user from storage,
+// and compares the password hash. Returns the user if credentials are valid,
+// otherwise returns ErrInvalidCredentials or other errors.
 func (a *AuthService) GetUser(ctx context.Context, allegedUser models.User) (models.User, error) {
 
 	if err := a.validateUser(allegedUser); err != nil {

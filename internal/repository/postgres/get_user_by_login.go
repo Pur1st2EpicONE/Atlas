@@ -8,6 +8,7 @@ import (
 	"github.com/wb-go/wbf/retry"
 )
 
+// GetUserByLogin retrieves a user by their login name from the database.
 func (s *AuthStorage) GetUserByLogin(ctx context.Context, login string) (models.User, error) {
 
 	row, err := s.db.QueryRowWithRetry(ctx, retry.Strategy(s.config.QueryRetryStrategy), `

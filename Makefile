@@ -1,4 +1,4 @@
-.PHONY: all up down reset local migrate-up migrate-down test postgres app_logs postgres_logs lint .env .env.example help
+.PHONY: all up down reset migrate-up migrate-down local lint test postgres app_logs postgres_logs .env .env.example help
 .POSIX:
 .SILENT:
 
@@ -27,19 +27,22 @@ down:
 reset:
 	docker volume rm atlas_postgres_data
 
-local:
-	if [ ! -f .env ]; then cat .env.example > .env; fi 
-	if [ ! -f config.yaml ]; then cp ./configs/config.dev.yaml ./config.yaml; fi 
-	if [ ! -f docker-compose.yaml ]; then cp ./deployments/docker-compose.dev.yaml ./docker-compose.yaml; fi
-	docker compose up -d postgres
-	until docker exec postgres pg_isready -U ${DB_USER} > /dev/null 2>&1; do sleep 1; done
-	bash -c 'trap "exit 0" INT; go run ./cmd/atlas/main.go'
-
 migrate-up:
 	@if command -v goose > /dev/null 2>&1; then $(GOOSE_CMD) up; else echo "You need Goose migration tool to use this command!"; fi
 
 migrate-down:
 	@if command -v goose > /dev/null 2>&1; then $(GOOSE_CMD) down; else echo "You need Goose migration tool to use this command!"; fi
+
+local:
+	if [ ! -f .env ]; then cat .env.example > .env; fi 
+	if [ ! -f config.yaml ]; then cp ./configs/config.dev.yaml ./config.yaml; fi 
+	if [ ! -f docker-compose.yaml ]; then cp ./deployments/docker-compose.dev.yaml ./docker-compose.yaml; fi
+	COMPOSE_BAKE=true docker compose up -d postgres
+	until docker exec postgres pg_isready -U ${DB_USER} > /dev/null 2>&1; do sleep 1; done
+	bash -c 'trap "exit 0" INT; go run ./cmd/atlas/main.go'
+
+lint:
+	golangci-lint run ./...
 
 test:
 	if [ ! -f .env ]; then cat .env.example > .env	; fi 
@@ -62,9 +65,6 @@ app_logs:
 postgres_logs:
 	docker compose logs --tail 10 postgres
 
-lint:
-	golangci-lint run ./...
-
 .env:
 	@:
 
@@ -73,14 +73,14 @@ help:
 	@echo "| up             | Start all services (postgres, app) in background                  |"
 	@echo "| down           | Stop and remove all containers, networks, and temporary files     |"
 	@echo "| reset          | Remove postgres Docker volume                                     |"
-	@echo "| local          | Start local dev environment (go 1.25.1 required)                  |"
 	@echo "| migrate-up     | Apply all database migrations (Goose migration tool required)     |"
 	@echo "| migrate-down   | Rollback all database migrations (Goose migration tool required)  |"
+	@echo "| local          | Start local dev environment (go 1.25.1 required)                  |"
+	@echo "| lint           | Run golangci-lint                                                 |"
 	@echo "| test           | Run unit and integration tests                                    |"
 	@echo "| postgres       | Open psql shell inside postgres container                         |"
 	@echo "| app_logs       | Show last 10 lines of app logs                                    |"
 	@echo "| postgres_logs  | Show last 10 lines of postgres logs                               |"
-	@echo "| lint           | Run golangci-lint                                                 |"
 	@echo " ———————————————————————————————————————————————————————————————————————————————————— "
 
 .DEFAULT:

@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+// UpdateItem updates an existing item in the database using the provided transaction.
+// It automatically sets the updated_at timestamp to NOW().
 func (s *CoreStorage) UpdateItem(tx *sql.Tx, ctx context.Context, itemID int64, updatedItem models.Item) error {
 
 	_, err := tx.ExecContext(ctx, `

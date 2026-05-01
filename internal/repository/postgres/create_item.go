@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+// CreateItem inserts a new item into the database using the provided transaction.
+// It returns the created item with generated ID and timestamps.
 func (s *CoreStorage) CreateItem(tx *sql.Tx, ctx context.Context, item models.Item) (models.Item, error) {
 
 	var created models.Item

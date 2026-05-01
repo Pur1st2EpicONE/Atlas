@@ -7,6 +7,8 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// ParseToken extracts the user ID from a JWT token string.
+// Returns ErrInvalidToken if the token is invalid or cannot be parsed.
 func (a *AuthService) ParseToken(tokenString string) (int64, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, a.keyFunc)
@@ -28,6 +30,7 @@ func (a *AuthService) ParseToken(tokenString string) (int64, error) {
 
 }
 
+// keyFunc is an internal method that returns the JWT signing key.
 func (a *AuthService) keyFunc(token *jwt.Token) (any, error) {
 	return []byte(a.config.TokenSignedString), nil
 }

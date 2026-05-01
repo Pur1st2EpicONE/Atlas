@@ -7,8 +7,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-const bcryptMaxLen = 72
+const bcryptMaxLen = 72 // bcryptMaxLen is the maximum allowed password length for bcrypt hashing
 
+// validateNewUser performs validation on a new user before creation.
+// It checks login, password, and role.
 func (a *AuthService) validateNewUser(user models.User) error {
 
 	if err := a.validateLogin(user.Login); err != nil {
@@ -24,6 +26,7 @@ func (a *AuthService) validateNewUser(user models.User) error {
 	return nil
 }
 
+// validateLogin checks that the login meets length constraints.
 func (a *AuthService) validateLogin(login string) error {
 
 	length := len(login)
@@ -42,6 +45,8 @@ func (a *AuthService) validateLogin(login string) error {
 
 }
 
+// validatePassword checks that the password is non‑empty,
+// meets minimum length, and does not exceed bcrypt limit.
 func (a *AuthService) validatePassword(password string) error {
 
 	length := len(password)
@@ -60,6 +65,7 @@ func (a *AuthService) validatePassword(password string) error {
 
 }
 
+// validateRole ensures the role is one of the predefined values (admin, manager, viewer).
 func (a *AuthService) validateRole(role string) error {
 
 	if role == "" {
@@ -76,6 +82,8 @@ func (a *AuthService) validateRole(role string) error {
 
 }
 
+// validateUser checks that a user object has non‑empty login and password.
+// Used when authenticating an existing user.
 func (a *AuthService) validateUser(user models.User) error {
 	if user.Login == "" {
 		return errs.ErrEmptyLogin
@@ -86,6 +94,7 @@ func (a *AuthService) validateUser(user models.User) error {
 	return nil
 }
 
+// validateItem validates all fields of an item (name, description, quantity, price).
 func (s *CoreService) validateItem(item models.Item) error {
 
 	if err := s.validateName(item.Name); err != nil {
@@ -105,6 +114,7 @@ func (s *CoreService) validateItem(item models.Item) error {
 
 }
 
+// validateName checks that the item name is non‑empty and within length limits.
 func (s *CoreService) validateName(name string) error {
 
 	length := len(name)
@@ -123,6 +133,7 @@ func (s *CoreService) validateName(name string) error {
 
 }
 
+// validateDescription checks that the description does not exceed the maximum allowed length.
 func (s *CoreService) validateDescription(description string) error {
 	if len(description) > s.config.MaxItemDescriptionLength {
 		return errs.ErrItemDescriptionTooLong
@@ -130,6 +141,7 @@ func (s *CoreService) validateDescription(description string) error {
 	return nil
 }
 
+// validateQuantity checks that the quantity is within defined minimum and maximum.
 func (s *CoreService) validateQuantity(quantity int) error {
 	if quantity < s.config.MinItemQuantity {
 		return errs.ErrItemQuantityTooLow
@@ -140,6 +152,8 @@ func (s *CoreService) validateQuantity(quantity int) error {
 	return nil
 }
 
+// validatePrice ensures the price is non‑negative, not zero, does not exceed the maximum,
+// and has at most two decimal places.
 func (s *CoreService) validatePrice(price decimal.Decimal) error {
 
 	if price.IsNegative() {
@@ -159,6 +173,7 @@ func (s *CoreService) validatePrice(price decimal.Decimal) error {
 
 }
 
+// validateFilter checks that the From date is not after the To date.
 func (s *CoreService) validateFilter(filter models.HistoryFilter) error {
 
 	if !filter.From.IsZero() && !filter.To.IsZero() && filter.From.After(filter.To) {

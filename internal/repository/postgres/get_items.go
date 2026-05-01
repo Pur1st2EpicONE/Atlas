@@ -7,6 +7,7 @@ import (
 	"github.com/wb-go/wbf/retry"
 )
 
+// GetItems returns all items from the database, ordered by ID.
 func (s *CoreStorage) GetItems(ctx context.Context) ([]models.Item, error) {
 
 	rows, err := s.db.QueryWithRetry(ctx, retry.Strategy(s.config.QueryRetryStrategy), `

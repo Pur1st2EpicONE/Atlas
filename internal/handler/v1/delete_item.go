@@ -8,6 +8,9 @@ import (
 	"github.com/wb-go/wbf/ginext"
 )
 
+// DeleteItem handles DELETE /api/v1/items/:id requests.
+// It parses the item ID from the URL, validates the user, and deletes the item.
+// On success, it returns a status message.
 func (h *Handler) DeleteItem(c *ginext.Context) {
 
 	itemID, err := strconv.ParseInt(c.Param("id"), 10, 64)

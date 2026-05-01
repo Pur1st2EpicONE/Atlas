@@ -7,6 +7,8 @@ import (
 	"github.com/wb-go/wbf/ginext"
 )
 
+// SignIn handles POST /api/v1/auth/sign-in requests.
+// It validates the login credentials and returns a JWT token on success.
 func (h *Handler) SignIn(c *ginext.Context) {
 
 	var request LoginDTO

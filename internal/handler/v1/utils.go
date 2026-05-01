@@ -14,10 +14,14 @@ import (
 	"github.com/wb-go/wbf/ginext"
 )
 
-const defaultLimit = 100
-const dateLayoutCSV = time.RFC3339
-const defaultFilename = "history"
+const (
+	defaultLimit    = 100          // defaultLimit is the maximum number of history records returned when limit is omitted
+	dateLayoutCSV   = time.RFC3339 // dateLayoutCSV is the time format used for CSV export timestamps
+	defaultFilename = "history"    // defaultFilename is used when a specific item filename cannot be determined
+)
 
+// getUserID extracts the authenticated user's ID from the Gin context.
+// It returns an error if the userID is not present or has the wrong type.
 func getUserID(c *ginext.Context) (int64, error) {
 	val, found := c.Get("userID")
 	if !found {
@@ -26,6 +30,8 @@ func getUserID(c *ginext.Context) (int64, error) {
 	return val.(int64), nil
 }
 
+// getRole extracts the authenticated user's role from the Gin context.
+// It returns an error if the role is not present or has the wrong type.
 func getRole(c *ginext.Context) (string, error) {
 	val, found := c.Get("role")
 	if !found {
@@ -34,6 +40,9 @@ func getRole(c *ginext.Context) (string, error) {
 	return val.(string), nil
 }
 
+// parseQuery builds a HistoryFilter from the request's query parameters.
+// Supported parameters: from, to, user, action, limit.
+// It applies defaults and validation (time formats, action values, limit range).
 func parseQuery(c *ginext.Context) (models.HistoryFilter, error) {
 
 	filter := models.HistoryFilter{Limit: defaultLimit}
@@ -90,6 +99,8 @@ func parseQuery(c *ginext.Context) (models.HistoryFilter, error) {
 
 }
 
+// parseTime parses a time string using multiple common layouts (RFC3339,
+// RFC3339 without timezone, date only, etc.). Returns UTC time or an error.
 func parseTime(timeStr string) (time.Time, error) {
 	if timeStr == "" {
 		return time.Time{}, errs.ErrMissingDate
@@ -114,6 +125,8 @@ func parseTime(timeStr string) (time.Time, error) {
 
 }
 
+// fmtRespond formats the response. If the query parameter "export=csv" is set,
+// it writes the data as a CSV file attachment; otherwise it responds with JSON.
 func fmtRespond(c *ginext.Context, data any) {
 
 	if c.Query("export") != "csv" {
@@ -158,6 +171,8 @@ func fmtRespond(c *ginext.Context, data any) {
 
 }
 
+// writeItemHistoryCSV writes a slice of ItemHistory records to a CSV writer.
+// It includes headers and truncates very long OldData/NewData JSON strings to 500 chars.
 func writeItemHistoryCSV(writer *csv.Writer, history []models.ItemHistory) error {
 
 	header := []string{"ID", "ItemID", "UserID",
@@ -201,10 +216,13 @@ func writeItemHistoryCSV(writer *csv.Writer, history []models.ItemHistory) error
 
 }
 
+// respondOK sends a standard JSON success response with the given data under the "result" key.
 func respondOK(c *ginext.Context, response any) {
 	c.JSON(http.StatusOK, ginext.H{"result": response})
 }
 
+// RespondError sends a JSON error response with the appropriate HTTP status code
+// based on the type of error. It aborts the request handler chain.
 func RespondError(c *ginext.Context, err error) {
 	if err != nil {
 		status, msg := mapErrorToStatus(err)
@@ -212,6 +230,8 @@ func RespondError(c *ginext.Context, err error) {
 	}
 }
 
+// mapErrorToStatus converts application errors into
+// HTTP status codes and user‑friendly messages.
 func mapErrorToStatus(err error) (int, string) {
 
 	switch {

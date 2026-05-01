@@ -9,6 +9,9 @@ import (
 	"fmt"
 )
 
+// UpdateItem partially updates an item. It retrieves the current item with a row lock,
+// applies the update fields, validates the result, and stores the changes.
+// Returns ErrItemNotFound if the item does not exist.
 func (s *CoreService) UpdateItem(ctx context.Context, userID int64, itemID int64, update models.Update) error {
 
 	err := s.storage.Transaction(ctx, func(tx *sql.Tx, ctx context.Context) error {
@@ -46,6 +49,7 @@ func (s *CoreService) UpdateItem(ctx context.Context, userID int64, itemID int64
 
 }
 
+// updateFields merges the non-nil fields from update into the old item.
 func updateFields(old *models.Item, new models.Update) {
 	if new.Name != nil {
 		old.Name = *new.Name
@@ -61,6 +65,8 @@ func updateFields(old *models.Item, new models.Update) {
 	}
 }
 
+// unexpectedError returns true if the error is a business logic error that should be logged,
+// and false for validation or not-found errors that are handled silently.
 func unexpectedError(err error) bool {
 
 	if err == nil {

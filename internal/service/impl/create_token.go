@@ -8,11 +8,13 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// Claims represents the JWT claims structure including the user role.
 type Claims struct {
-	jwt.StandardClaims
-	Role string
+	jwt.StandardClaims        // StandardClaims holds subject, expiry, issued at
+	Role               string // Role is the user's permission level (admin, manager, viewer)
 }
 
+// CreateToken generates a JWT token for the given user using the configured signing key and TTL.
 func (a *AuthService) CreateToken(user models.User) (string, error) {
 
 	claims := Claims{
@@ -29,6 +31,7 @@ func (a *AuthService) CreateToken(user models.User) (string, error) {
 
 }
 
+// KeyFunc returns the JWT signing key for token validation.
 func (a *AuthService) KeyFunc(token *jwt.Token) (any, error) {
 	return []byte(a.config.TokenSignedString), nil
 }

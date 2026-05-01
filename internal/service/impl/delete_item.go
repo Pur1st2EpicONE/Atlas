@@ -8,6 +8,8 @@ import (
 	"fmt"
 )
 
+// DeleteItem removes the item identified by itemID, after setting the current user ID
+// in the transaction. Returns ErrItemNotFound if the item does not exist.
 func (s *CoreService) DeleteItem(ctx context.Context, userID int64, itemID int64) error {
 
 	err := s.storage.Transaction(ctx, func(tx *sql.Tx, ctx context.Context) error {

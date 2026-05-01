@@ -8,6 +8,7 @@ import (
 	"errors"
 )
 
+// GetItem retrieves an item by ID. Returns ErrItemNotFound if the item does not exist.
 func (s *CoreService) GetItem(ctx context.Context, itemID int64) (models.Item, error) {
 	item, err := s.storage.GetItem(ctx, itemID)
 	if err != nil {

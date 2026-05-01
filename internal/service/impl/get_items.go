@@ -5,6 +5,7 @@ import (
 	"context"
 )
 
+// GetItems returns all items from the database.
 func (s *CoreService) GetItems(ctx context.Context) ([]models.Item, error) {
 	items, err := s.storage.GetItems(ctx)
 	if err != nil {

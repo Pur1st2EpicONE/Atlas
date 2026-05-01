@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+// DeleteItem removes an item from the database by ID using the provided transaction.
+// Returns sql.ErrNoRows if no item was deleted.
 func (s *CoreStorage) DeleteItem(tx *sql.Tx, ctx context.Context, itemID int64) error {
 
 	result, err := tx.ExecContext(ctx, `

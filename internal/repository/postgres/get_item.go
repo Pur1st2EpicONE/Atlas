@@ -8,6 +8,7 @@ import (
 	"github.com/wb-go/wbf/retry"
 )
 
+// GetItem retrieves a single item by its ID from the database.
 func (s *CoreStorage) GetItem(ctx context.Context, id int64) (models.Item, error) {
 
 	var item models.Item
